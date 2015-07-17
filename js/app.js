@@ -1,81 +1,98 @@
+
+var constants = {
+    rows : 6,
+    columns : 5,
+    blockWidth : 101,
+    blockHeight : 83,
+    worldWidth : 5 * 101,
+    worldHeight : 6 * 83
+};
+
 // Enemies our player must avoid
 var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-    var obj = Object.create(Enemy.prototype);
-    this.x = 0;
-    this.y = 0;
+    var x = 0;
+    var y = 0;
+    var speed = 1 + Math.floor(Math.random() * 3);
+    var sprite = "images/enemy-bug.png";
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-    obj.sprite = 'images/enemy-bug.png';
-    return obj;
+    var that = {};
+    that.render = function() {
+	ctx.drawImage(Resources.get(sprite),x,y);
+    };
+    that.setPosition = function( row ) {
+	x = Math.floor( 5 * Math.random()) * constants.blockWidth;
+	y = constants.blockHeight + row * constants.blockHeight;
+    };
+    that.update = function(dt) {
+	if( x > constants.worldWidth ) {
+	    x = 0;
+	} // if
+	else {
+	    x = x + dt * speed * 100;
+	} // else
+	y = y;
+    };
+    return that;
 };
 
-Enemy.prototype.whoami = function() {
-  console.log( "I am an enemy." );
-};
-
-Enemy.prototype.getimage = function() {
-    //return Resources.get(this.sprite);
-    return this.sprite;
-};
-
-
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    this.x += 1;
-    this.y += 1;
-}
-
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
 
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
-    var obj = Object.create(Enemy.prototype);
-    this.x = 200;
-    this.y = 200;
-    this.sprite = 'images/char-boy.png';
-    return obj;
-} 
+    var x = Math.floor(constants.columns/2) * constants.blockWidth;
+    var y = (constants.rows - 1) * constants.blockHeight;
+    var sprite = "images/char-boy.png";
+    var reset = function() {
+	x = Math.floor(constants.columns/2) * constants.blockWidth;
+	y = (constants.rows - 1) * constants.blockHeight;
+    };
+    var roomToMoveUp = function() {
+	return y > 0;
+    };
+    var roomToMoveDown = function() {
+	return y < (constants.rows - 1) * constants.blockHeight;
+    };
+    var roomToMoveLeft = function() {
+	return x > 0;
+    };
+    var roomToMoveRight = function() {
+	return x < (constants.columns - 1) * constants.blockWidth;
+    };
 
-Player.prototype.update = function() {
-}
-
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
-
-Player.prototype.handleInput = function() {
-}
-
+    var that = {};
+    that.handleInput = function(e) {
+	if( e === "up" && roomToMoveUp() ) {
+	    y = y - constants.blockHeight;
+	} 
+	else if( e === "down" && roomToMoveDown() ) {
+	    y = y + constants.blockHeight;
+	} // else if
+	else if( e === "left" && roomToMoveLeft() ) {
+	    x = x - constants.blockWidth;
+	} // else if
+	else if( e === "right" && roomToMoveRight() ) {
+	    x = x + constants.blockWidth;
+	} // else if
+    };
+    that.render = function() {
+	ctx.drawImage(Resources.get(sprite), x, y);
+    };
+    that.update = function() {
+    };
+    return that;
+};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = [];
-var e = new Enemy();
-console.log( typeof e );
-allEnemies.push(e);
-var i;
-for( i = 0; i < allEnemies.length; i += 1 ) {
-    allEnemies[i].whoami();
-    var pic = allEnemies[i].getimage();
-    console.log( pic );
+for( var i = 0; i < 3; i = i + 1 ) {
+    var e = Enemy();
+    e.setPosition(i);
+    allEnemies.push(e);
 } // for
-var player = new Player();
-
-
+var player = Player();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
