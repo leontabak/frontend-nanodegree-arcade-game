@@ -22,12 +22,27 @@
             urlOrArr.forEach(function(url) {
                 _load(url);
             });
+	    //            console.log( "array" );
+            //for( var k in resourceCache ) {
+            //  console.log( k );
+            //  console.log( typeof k );
+            //  console.log( resourceCache[k] );
+            //} // for
+
         } else {
             /* The developer did not pass an array to this function,
              * assume the value is a string and call our image loader
              * directly.
              */
+
             _load(urlOrArr);
+            //if( urlOrArr == "images/enemy-bug.png" ) {
+	    //	console.log( "found image file: images/enemy-bug.png" );
+            //    for( var k in resourceCache ) {
+	    //	    console.log( k );
+            //    } // for
+            //} // if
+
         }
     }
 
