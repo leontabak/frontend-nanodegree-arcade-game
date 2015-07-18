@@ -11,19 +11,19 @@
 // used in determining the speed with which Enemies
 // move.
 var parameters = {
-    rows: 6,             // #rows
-    columns: 5,          // #columns
-    blockWidth: 101,     // width-of-each-column
-    blockHeight: 83,     // height-of-each-row
-    worldWidth: 5 * 101, // #columns * width-of-each-column
-    worldHeight: 6 * 83, // #rows * height-of-each-row
+    ROWS: 6,             // #rows
+    COLUMNS: 5,          // #columns
+    BLOCK_WIDTH: 101,     // width-of-each-column
+    BLOCK_HEIGHT: 83,     // height-of-each-row
+    WORLD_WIDTH: 5 * 101, // #columns * width-of-each-column
+    WORLD_HEIGHT: 6 * 83, // #rows * height-of-each-row
 
     // Assign to the speed multiplier a small value
     // to make it easy to win the game.
     // This value can be increased later (after
     // program is complete, tested, and working) to
     // make a more challenging game.
-    speedMultiplier: 32
+    SPEED_MULTIPLIER: 32
 };
 
 var BoundingBox = function (cx, cy, hw, hh) {
@@ -89,8 +89,8 @@ var Boundable = function (upperLeftCorner) {
     // Bounding boxes can be used to compute intersections/collisions
     // between players and enemies.
     that.boundingBox = function () {
-        var hw = parameters.blockWidth/2;
-        var hh = parameters.blockHeight/2;
+        var hw = parameters.BLOCK_WIDTH/2;
+        var hh = parameters.BLOCK_HEIGHT/2;
         var cx = ul.getX() + hw;
         var cy = ul.getY() + hh;
         return new BoundingBox(cx, cy, hw, hh);
@@ -129,16 +129,16 @@ var Enemy = function () {
     // setPosition() places that Enemy in a specified row and at a
     // randomly selected horizontal coordinate.
     that.setPosition = function (row) {
-        upperLeftCorner.setX(Math.floor(5 * Math.random()) * parameters.blockWidth);
-        upperLeftCorner.setY(parameters.blockHeight + row * parameters.blockHeight);
+        upperLeftCorner.setX(Math.floor(5 * Math.random()) * parameters.BLOCK_WIDTH);
+        upperLeftCorner.setY(parameters.BLOCK_HEIGHT + row * parameters.BLOCK_HEIGHT);
     };
 
     // update() moves the Enemy in each frame of the animation.
     that.update = function (dt) {
-        if (upperLeftCorner.getX() > parameters.worldWidth) {
+        if (upperLeftCorner.getX() > parameters.WORLD_WIDTH) {
             upperLeftCorner.setX(0);
         } else {
-            upperLeftCorner.setX(upperLeftCorner.getX() + dt * speed * parameters.speedMultiplier);
+            upperLeftCorner.setX(upperLeftCorner.getX() + dt * speed * parameters.SPEED_MULTIPLIER);
         } // else
     };
     return that;
@@ -154,8 +154,8 @@ var Player = function () {
     // (x,y) is the upper-left corner of the smallest box
     // that contains the image that represents the player.
     "use strict";
-    var x = Math.floor(parameters.columns/2) * parameters.blockWidth;
-    var y = (parameters.rows - 1) * parameters.blockHeight;
+    var x = Math.floor(parameters.COLUMNS/2) * parameters.BLOCK_WIDTH;
+    var y = (parameters.ROWS - 1) * parameters.BLOCK_HEIGHT;
     var upperLeftCorner = new Point2D(x, y);
     var sprite = "images/char-boy.png";
 
@@ -167,13 +167,13 @@ var Player = function () {
         return upperLeftCorner.getY() > 0;
     };
     var roomToMoveDown = function () {
-        return upperLeftCorner.getY() < (parameters.rows - 1) * parameters.blockHeight;
+        return upperLeftCorner.getY() < (parameters.ROWS - 1) * parameters.BLOCK_HEIGHT;
     };
     var roomToMoveLeft = function () {
         return upperLeftCorner.getX() > 0;
     };
     var roomToMoveRight = function () {
-        return upperLeftCorner.getX() < (parameters.columns - 1) * parameters.blockWidth;
+        return upperLeftCorner.getX() < (parameters.COLUMNS - 1) * parameters.BLOCK_WIDTH;
     };
 
     // Create an object named "that" that contains functions
@@ -191,13 +191,13 @@ var Player = function () {
     // cell on the gameboard accordingly.
     that.handleInput = function (e) {
         if (e === "up" && roomToMoveUp()) {
-            upperLeftCorner.setY(upperLeftCorner.getY() - parameters.blockHeight);
+            upperLeftCorner.setY(upperLeftCorner.getY() - parameters.BLOCK_HEIGHT);
         } else if (e === "down" && roomToMoveDown()) {
-            upperLeftCorner.setY(upperLeftCorner.getY() + parameters.blockHeight);
+            upperLeftCorner.setY(upperLeftCorner.getY() + parameters.BLOCK_HEIGHT);
         } else if (e === "left" && roomToMoveLeft()) {
-            upperLeftCorner.setX(upperLeftCorner.getX() - parameters.blockWidth);
+            upperLeftCorner.setX(upperLeftCorner.getX() - parameters.BLOCK_WIDTH);
         } else if (e === "right" && roomToMoveRight()) {
-            upperLeftCorner.setX(upperLeftCorner.getX() + parameters.blockWidth);
+            upperLeftCorner.setX(upperLeftCorner.getX() + parameters.BLOCK_WIDTH);
         } // else if
     };
 
@@ -209,8 +209,8 @@ var Player = function () {
 
     // reset() returns the player to its starting position.
     that.reset = function () {
-        upperLeftCorner.setX(Math.floor(parameters.columns/2) * parameters.blockWidth);
-        upperLeftCorner.setY((parameters.rows - 1) * parameters.blockHeight);
+        upperLeftCorner.setX(Math.floor(parameters.COLUMNS/2) * parameters.BLOCK_WIDTH);
+        upperLeftCorner.setY((parameters.ROWS - 1) * parameters.BLOCK_HEIGHT);
     };
 
     // The code in engine.js requires that the Player class have
