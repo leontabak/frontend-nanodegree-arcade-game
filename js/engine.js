@@ -80,7 +80,8 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+	// Added this call on 17 July 2015---Leon Tabak
+        checkCollisions();
     }
 
     /* This is called by the update function  and loops through all of the
@@ -95,6 +96,21 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
+    }
+
+    // Added this function on 17 July 2015---Leon Tabak
+    // Try intersecting bounding boxes of each enemy with
+    // the bounding box of the player.
+    // Return true if an intersection is found and false
+    // otherwise.
+    function checkCollisions () {
+        var playerBox = player.boundingBox();
+	allEnemies.forEach(function(enemy) {
+		var enemyBox = enemy.boundingBox();
+		if(enemyBox.intersects(playerBox)) {
+		    player.reset();
+		} // if
+	    });
     }
 
     /* This function initially draws the "game level", it will then call
