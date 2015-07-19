@@ -11,12 +11,16 @@
 // used in determining the speed with which Enemies
 // move.
 var parameters = {
-    ROWS: 6,             // #rows
-    COLUMNS: 5,          // #columns
+    ROWS: 6,              // #rows
+    COLUMNS: 5,           // #columns
     BLOCK_WIDTH: 101,     // width-of-each-column
     BLOCK_HEIGHT: 83,     // height-of-each-row
     WORLD_WIDTH: 5 * 101, // #columns * width-of-each-column
     WORLD_HEIGHT: 6 * 83, // #rows * height-of-each-row
+
+    DANCE_AMPLITUDE: 4,   // how high does the victorious player jump
+    DANCE_FREQUENCY: 16,  // how fast does the player jump up and down
+    DANCE_TIME: 256,      // how long does the player celebrate
 
     // Assign to the speed multiplier a small value
     // to make it easy to win the game.
@@ -158,6 +162,14 @@ var Player = function () {
     var y = (parameters.ROWS - 1) * parameters.BLOCK_HEIGHT;
     var upperLeftCorner = new Point2D(x, y);
     var sprite = "images/char-boy.png";
+    var countDown = 0;
+    var losses = 0;
+    var wins = 0;
+
+    var returnToStartingPosition = function () {
+        upperLeftCorner.setX(Math.floor(parameters.COLUMNS/2) * parameters.BLOCK_WIDTH);
+        upperLeftCorner.setY((parameters.ROWS - 1) * parameters.BLOCK_HEIGHT);
+    };
 
     // The following four methods can only be called
     // from within this definition of the Player class.
@@ -183,6 +195,19 @@ var Player = function () {
     // (This means that it has a boundingBox() method.)
     var that = new Boundable(upperLeftCorner);
 
+    that.decrementCountDown = function () {
+        countDown = countDown - 1;
+    };
+    that.getCountDown = function () {
+        return countDown;
+    };
+    that.getLosses = function () {
+        return losses;
+    };
+    that.getWins = function () {
+        return wins;
+    };
+
     // The player's event listener calls handleInput().
     // If the human being who is playing the game has
     // pressed an arrow key, the value of the function's
@@ -190,8 +215,17 @@ var Player = function () {
     // The method will move the player to a neighboring
     // cell on the gameboard accordingly.
     that.handleInput = function (e) {
-        if (e === "up" && roomToMoveUp()) {
+        if (countDown > 0) {
+            // player pauses to do a touchdown dance
+            countDown = countDown - 1;
+        } else if (e === "up" && roomToMoveUp()) {
             upperLeftCorner.setY(upperLeftCorner.getY() - parameters.BLOCK_HEIGHT);
+            if (!roomToMoveUp()) {
+                // moving up got the player to the water
+                wins = wins + 1;
+                // start clock for victory dance
+                countDown = parameters.DANCE_TIME;
+            } // if
         } else if (e === "down" && roomToMoveDown()) {
             upperLeftCorner.setY(upperLeftCorner.getY() + parameters.BLOCK_HEIGHT);
         } else if (e === "left" && roomToMoveLeft()) {
@@ -204,14 +238,27 @@ var Player = function () {
     // render() draws a picture of the player on the
     // gameboard during each frame of the animation.
     that.render = function () {
-        ctx.drawImage(Resources.get(sprite), upperLeftCorner.getX(), upperLeftCorner.getY());
+        var xCoord = upperLeftCorner.getX();
+        var yCoord = upperLeftCorner.getY();
+        if (countDown > 0) {
+            countDown = countDown - 1;
+            if (countDown === 0) {
+                returnToStartingPosition();
+            } else if ((countDown/parameters.DANCE_FREQUENCY) % 2 === 0) {
+                yCoord = yCoord + parameters.DANCE_AMPLITUDE;
+            } else {
+                yCoord = yCoord - parameters.DANCE_AMPLITUDE;
+            } // else
+        } // if
+        ctx.drawImage(Resources.get(sprite), xCoord, yCoord);
+
+        xCoord = parameters.WORLD_WIDTH/2;
+        yCoord = parameters.WORLD_HEIGHT + parameters.BLOCK_HEIGHT;
+        ctx.fillText("Wins " + wins, xCoord, yCoord);
     };
 
     // reset() returns the player to its starting position.
-    that.reset = function () {
-        upperLeftCorner.setX(Math.floor(parameters.COLUMNS/2) * parameters.BLOCK_WIDTH);
-        upperLeftCorner.setY((parameters.ROWS - 1) * parameters.BLOCK_HEIGHT);
-    };
+    that.reset = returnToStartingPosition;
 
     // The code in engine.js requires that the Player class have
     // an update() method.

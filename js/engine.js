@@ -29,6 +29,12 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+    // These attributes for drawing text added by
+    // L. Tabak on 19 July 2015
+    ctx.fillStyle = "white";
+    ctx.font = "30pt Arial";
+    ctx.textAlign = "center";
+
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
